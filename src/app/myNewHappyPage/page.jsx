@@ -2,13 +2,14 @@
 
 import React from 'react';
 import './hello.css';
-import vars from "./var-data.json";
+import pageData from "./var-data.json";
 
 const Hello = () => {
+    const { vars } = pageData;
     return (
         <div className="hello-container">
-            <h1 className="hello-title">{var1}</h1>
-            <p className="hello-description">{var2}</p>
+            <h1 className="hello-title">{vars.var1}</h1>
+            <p className="hello-description">{vars.var2}</p>
         </div>
     );
 };

@@ -1,1 +1,6 @@
-{"var1":"Astra is Blakc!","var2":"But Astra Best!"}
+{
+    "vars": {
+        "var1":"Astra is Blakc!",
+        "var2":"But Astra Best!"
+    }
+}
