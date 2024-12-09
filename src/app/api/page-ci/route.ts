@@ -38,9 +38,16 @@ export const POST = async (req: NextRequest) => {
         const targetDir = resolve(pathToRepoRoot, "src", "app", directory);
 
         await git.pull("origin", branch);
+        console.log("Pulled changes from branch");
+
         await git.add(`${targetDir}/*`);
+        console.log("Added changes to stage");
+
         await git.commit(`Add ${directory} page`);
+        console.log("Committed changes");
+        
         await git.push("origin", branch);
+        console.log("Pushed changes to branch");
 
         return NextResponse.json({ status: 200, message: `Changes in '${directory}' pushed successfully to '${branch}'!` });
 
