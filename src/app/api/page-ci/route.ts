@@ -11,9 +11,10 @@ const pathToRepoRoot = resolve(__dirname, "../");
 console.log("Path to repo root:", pathToRepoRoot);
 
 const githubToken = process.env.GITHUB_PAT;
+const branch = "main";
 
 export const POST = async (req: NextRequest) => {
-    const { directory, branch = "Naman" } = await req.json();
+    const { directory } = await req.json();
     console.log("directory to be staged => ", directory);
     console.log("git-branch => ", branch);
 
@@ -27,15 +28,32 @@ export const POST = async (req: NextRequest) => {
             baseDir: pathToRepoRoot,
             binary: 'git',
             maxConcurrentProcesses: 6,
-            config: [
-              `url=https://${githubToken}:x-oauth-basic@github.com/username/repository.git`,  // Use your token here
-            ]
         });
 
-        const status = await git.status();
-        console.log("git-status => ", status);
-
         const targetDir = resolve(pathToRepoRoot, "src", "app", directory);
+
+        const remoteUrl = `https://${githubToken}@github.com/Test3362/TestPageCi.git`;
+
+        await git.addConfig('user.name', 'Test3362'); // Set your GitHub username
+        await git.addConfig('user.email', 'namang25101@gmail.com'); // Set the associated email
+
+        // Ensure remote is set up
+        await git.addRemote("origin", remoteUrl).catch((err) => {
+            console.log("Remote already exists, skipping...");
+        });
+
+        await git.fetch('origin', branch);
+        console.log("Fetched all branches from remote");
+
+        // Ensure the branch exists locally
+        const branches = await git.branch();
+        if (!branches.all.includes(branch)) {
+            console.log(`Branch '${branch}' does not exist locally. Checking it out.`);
+            await git.checkoutBranch(branch, `origin/${branch}`);
+        } else {
+            console.log(`Branch '${branch}' exists locally.`);
+            await git.checkout(branch);
+        }
 
         await git.pull("origin", branch);
         console.log("Pulled changes from branch");
@@ -45,7 +63,7 @@ export const POST = async (req: NextRequest) => {
 
         await git.commit(`Add ${directory} page`);
         console.log("Committed changes");
-        
+
         await git.push("origin", branch);
         console.log("Pushed changes to branch");
 
